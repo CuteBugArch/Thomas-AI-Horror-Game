@@ -105,4 +105,52 @@ public class SightPerception : MonoBehaviour
         return false;
 
     }
+
+        private void OnDrawGizmos()
+    {
+        // Mengecek jika eye position belum direference
+        // maka langsung keluar function dan gizmos 
+        // tidak perlu digambar
+        if (_eyePosition == null)
+        {
+            return;
+        }
+ 
+        // Mengubah warna default gizmos menjadi merah
+        Gizmos.color = Color.red;
+        // Memanggil function CheckSight untuk 
+        // mengecek apakah AI melihat target
+        // kemudian memasukkan hasil nya ke variable isSeeTarget
+        bool isSeeTarget = CheckSight();
+        if (isSeeTarget == true)
+        {
+            // Jika target terlihat oleh AI, maka warna gizmos
+            // berubah menjadi hijau
+            Gizmos.color = Color.green;
+        }
+ 
+        // Menggambar sphere(bola) di dalam window scene
+        // posisi tengah nya ada di posisi eye
+        // radius nya berdasarkan view distance  
+        // sphere ini digunakan untuk menggambar jangkauan
+        // pandangan AI
+        Gizmos.DrawWireSphere(_eyePosition.position, _viewDistance);
+ 
+        // Menentukan arah kiri dan kanan, untuk batas kiri 
+        // dan batas kanan pengelihatan AI, berdasarkan view angle.
+        // Caranya simple, cukup menggeser dari arah depan mata AI
+        // ke kiri dan kanan, sebesar sudut pandang AI dibagi dengan dua
+        Vector3 left = Quaternion.Euler(0, -_viewAngle / 2, 0)
+                       * _eyePosition.forward;
+        Vector3 right = Quaternion.Euler(0, _viewAngle / 2, 0) 
+                       * _eyePosition.forward;
+ 
+        // Menggambar garis dari posisi mata ke arah batas kiri
+        // sejauh jarak pandang AI
+        Gizmos.DrawRay(_eyePosition.position, left * _viewDistance);
+        // Menggambar garis dari posisi mata ke arah batas kanan
+        // sejauh jarak pandang AI
+        Gizmos.DrawRay(_eyePosition.position, right * _viewDistance);
+    }
+    
 }
